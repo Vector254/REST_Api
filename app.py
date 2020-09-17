@@ -20,7 +20,7 @@ pitches = [
 
 @app.route('/pitcher/api/v1.0/pitches', methods=['GET'])
 def get_pitches():
-    return jsonify({'pitches': pitches})
+     return jsonify({'pitches': [make_public_pitch(pitch) for pitch in pitches]})
 
 @app.route('/pitcher/api/v1.0/pitches/<int:pitch_id>', methods=['GET'])
 def get_pitch(pitch_id):
@@ -71,6 +71,17 @@ def delete_pitch(pitch_id):
         abort(404)
     pitches.remove(pitch[0])
     return jsonify({'result': True})
+
+def make_public_pitch(pitch):
+    new_pitch = {}
+    for field in pitch:
+        if field == 'id':
+            new_pitch['uri'] = url_for('get_pitch', pitch_id=pitch['id'], _external=True)
+        else:
+            new_pitch[field] = pitch[field]
+    return new_pitch
+
+
 
 
 if __name__ == '__main__':
